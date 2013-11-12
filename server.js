@@ -1,84 +1,30 @@
-//
-// # SimpleServer
-//
-// A simple chat server using Socket.IO, Express, and Async.
-//
+#!/bin/env node
+//  OpenShift sample Node application
 var http = require('http');
-var path = require('path');
 
-var async = require('async');
-var socketio = require('socket.io');
-var express = require('express');
+//Get the environment variables we need.
+var ipaddr  = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
+var port    = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 
-//
-// ## SimpleServer `SimpleServer(obj)`
-//
-// Creates a new instance of SimpleServer with the following options:
-//  * `port` - The HTTP port to listen on. If `process.env.PORT` is set, _it overrides this value_.
-//
-var router = express();
-var server = http.createServer(router);
-var io = socketio.listen(server);
+http.createServer(function (req, res) {
+	var addr = "unknown";
+	var out = "";
+	if (req.headers.hasOwnProperty('x-forwarded-for')) {
+		addr = req.headers['x-forwarded-for'];
+	} else if (req.headers.hasOwnProperty('remote-addr')){
+		addr = req.headers['remote-addr'];
+	}
 
-router.use(express.static(path.resolve(__dirname, 'client')));
-var messages = [];
-var sockets = [];
-
-io.on('connection', function (socket) {
-    messages.forEach(function (data) {
-      socket.emit('message', data);
-    });
-
-    sockets.push(socket);
-
-    socket.on('disconnect', function () {
-      sockets.splice(sockets.indexOf(socket), 1);
-      updateRoster();
-    });
-
-    socket.on('message', function (msg) {
-      var text = String(msg || '');
-
-      if (!text)
-        return;
-
-      socket.get('name', function (err, name) {
-        var data = {
-          name: name,
-          text: text
-        };
-
-        broadcast('message', data);
-        messages.push(data);
-      });
-    });
-
-    socket.on('identify', function (name) {
-      socket.set('name', String(name || 'Anonymous'), function (err) {
-        updateRoster();
-      });
-    });
-  });
-
-function updateRoster() {
-  async.map(
-    sockets,
-    function (socket, callback) {
-      socket.get('name', callback);
-    },
-    function (err, names) {
-      broadcast('roster', names);
-    }
-  );
-}
-
-function broadcast(event, data) {
-  sockets.forEach(function (socket) {
-    socket.emit(event, data);
-  });
-}
-
-server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
-  var addr = server.address();
-  console.log("Chat server listening at", addr.address + ":" + addr.port);
-});
+	if (req.headers.hasOwnProperty('accept')) {
+		if (req.headers['accept'].toLowerCase() == "application/json") {
+			  res.writeHead(200, {'Content-Type': 'application/json'});
+			  res.end(JSON.stringify({'ip': addr}, null, 4) + "\n");			
+			  return ;
+		}
+	}
+	
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.write("Welcome to Node.js on OpenShift!\n\n");
+  res.end("Your IP address seems to be " + addr + "\n");
+}).listen(port, ipaddr);
+console.log("Server running at http://" + ipaddr + ":" + port + "/");

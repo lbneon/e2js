@@ -1,26 +1,19 @@
+Node.js on OpenShift
+====================
 
-    ,-----.,--.                  ,--. ,---.   ,--.,------.  ,------.
-    '  .--./|  | ,---. ,--.,--. ,-|  || o   \  |  ||  .-.  \ |  .---'
-    |  |    |  || .-. ||  ||  |' .-. |`..'  |  |  ||  |  \  :|  `--, 
-    '  '--'\|  |' '-' ''  ''  '\ `-' | .'  /   |  ||  '--'  /|  `---.
-     `-----'`--' `---'  `----'  `---'  `--'    `--'`-------' `------'
-    ----------------------------------------------------------------- 
+This git repository helps you get up and running quickly w/ a node.js installation
+on OpenShift. 
+ 
+Running on OpenShift
+----------------------------
 
+Create an account at http://www.openshift.com/
 
-Welcome to Cloud9 IDE!
+Create a nodejs-0.6 application (you can call your application whatever you want)
 
-To get you started, we have created a demo chat application.
+    rhc create-app mynodejs nodejs-0.6 --from-code=https://github.com/openshift/nodejs-example.git
 
-1) Open the server.js file
+That's it, you can now checkout your application at:
 
-2) Click the 'Run' button at the top to start your server,
+    http://mynodejs-$yournamespace.rhcloud.com
 
-3) Click the URL that is emitted to the Output tab of the console
-
-Happy coding!
-The Cloud9 IDE team
-
-## Support & Documentation
-
-Visit http://docs.c9.io for documentation, or http://support.c9.io for support.
-To watch some training videos, visit http://www.youtube.com/user/c9ide.
