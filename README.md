@@ -7,7 +7,7 @@
     ----------------------------------------------------------------- 
 
 
-Welcome to Cloud9 IDE!
+Welcome to Cloud9 IDE!1
 
 To get you started, we have created a demo chat application.
 
