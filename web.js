@@ -2,7 +2,7 @@
 //Load sample Node application
 var http = require('http');
 var url = require('url');
-var fs = require('fs');
+//var fs = require('fs');
 
 //Get the environment variables we need.
 var ipaddr  = process.env.IP   || "127.0.0.1";
@@ -25,6 +25,7 @@ http.createServer(function (req, res) { // request and response
 		}
 	}
 	
+	/*
 	var pathname = url.parse(req.url).pathname
 	if(pathname == "/game") {
 	    fs.readFile('./ejsa/index.html', 'utf-8',function (err, data) {//read cotent
@@ -40,6 +41,7 @@ http.createServer(function (req, res) { // request and response
         res.write("Welcome to Node.js on OpenShift!\n\n");
         res.end("Your IP address seems to be " + addr + "\n");
 	}
+	*/
 }).listen(port, ipaddr);
 
 console.log("Server running at http://" + ipaddr + ":" + port + "/");
