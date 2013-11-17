@@ -5,8 +5,8 @@ var url = require('url');
 var fs = require('fs');
 
 //Get the environment variables we need.
-var ipaddr  = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
-var port    = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var ipaddr  = process.env.IP   || "127.0.0.1";
+var port    = process.env.PORT || 5000;
 
 http.createServer(function (req, res) { // request and response
 	var addr = "unknown";
