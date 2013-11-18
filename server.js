@@ -1,47 +1,69 @@
+#!/bin/env node
 
-/**
- * Module dependencies.
- */
+var express = require('express');
 
-var express = require('express')
-  , routes = require('./routes');
+var App = function(){
 
-//var app = express();
-var app = express.createServer();
+  // Scope
 
-//var port    = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080;
-var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
-app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 8080); app.set('ipaddr', process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1");
+  var self = this;
 
-// Configuration
+  // Setup
 
-////app.configure(function(){
-////  app.set('views', __dirname + '/views');
-////  app.set('view engine', 'jade');
-////  app.use(express.bodyParser());
-////  app.use(express.methodOverride());
-////  app.use(app.router);
-////  app.use(express.static(__dirname + '/public'));
-////});
-////
-////app.configure('development', function(){
-////  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-////});
-////
-////app.configure('production', function(){
-////  app.use(express.errorHandler());
-////});
+  self.ipaddr  = process.env.OPENSHIFT_INTERNAL_IP;
+  self.port    = parseInt(process.env.OPENSHIFT_INTERNAL_PORT) || 8080;
 
-app.use(express.logger());
+  if (typeof self.ipaddr === "undefined") {
+    console.warn('No OPENSHIFT_INTERNAL_IP environment variable');
+  };
+  
+  
+   
 
-// Routes
+  // Web app logic
+  self.routes = {};
+  self.routes['health'] = function(req, res){ res.send('1'); };
 
-//app.get('/', routes.index);
-app.get('/', function(req, res){
-    res.send('Hello World');
-});
+  self.routes['root'] = function(req, res){
+    self.db.collection('names').find().toArray(function(err, names) {
+        res.header("Content-Type:","text/json");
+        res.end(JSON.stringify(names));
+    });
+  };
 
+    // Webapp urls
+  
+  self.app  = express.createServer();
+  self.app.get('/health', self.routes['health']);
+  self.app.get('/', self.routes['root']);
+  
+  //starting the nodejs server with express
 
-app.listen(port);
-//console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
-console.log('Express server started on port %s', process.env.PORT);
+  self.startServer = function(){
+    self.app.listen(self.port, self.ipaddr, function(){
+      console.log('%s: Node server started on %s:%d ...', Date(Date.now()), self.ipaddr, self.port);
+    });
+  }
+
+  // Destructors
+
+  self.terminator = function(sig) {
+    if (typeof sig === "string") {
+      console.log('%s: Received %s - terminating Node server ...', Date(Date.now()), sig);
+      process.exit(1);
+    };
+    console.log('%s: Node server stopped.', Date(Date.now()) );
+  };
+
+  process.on('exit', function() { self.terminator(); });
+
+  self.terminatorSetup = function(element, index, array) {
+    process.on(element, function() { self.terminator(element); });
+  };
+
+  ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT', 'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGPIPE', 'SIGTERM'].forEach(self.terminatorSetup);
+
+};
+
+//make a new express app
+var app = new App();
