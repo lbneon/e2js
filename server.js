@@ -1,7 +1,7 @@
 #!/bin/env node
 
 var express = require('express'),
-    app = express();
+    app = express.createServer();
 
 //Get the environment variables we need.
 var ipaddr  = process.env.OPENSHIFT_NODEJS_IP || process.env.OPENSHIFT_INTERNAL_IP || "127.0.0.1";
