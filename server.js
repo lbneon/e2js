@@ -1,45 +1,44 @@
-#!/bin/env node
-//Load sample Node application
-var http = require('http');
-var url = require('url');
-var fs = require('fs');
 
-//Get the environment variables we need.
-var ipaddr  = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
+/**
+ * Module dependencies.
+ */
+
+var express = require('express')
+  , routes = require('./routes');
+
+var app = express();
+
 var port    = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080;
 
-http.createServer(function (req, res) { // request and response
-	var addr = "unknown";
-	var out = "";
-	if (req.headers.hasOwnProperty('x-forwarded-for')) {
-		addr = req.headers['x-forwarded-for'];
-	} else if (req.headers.hasOwnProperty('remote-addr')){
-		addr = req.headers['remote-addr'];
-	}
+// Configuration
 
-	if (req.headers.hasOwnProperty('accept')) {
-		if (req.headers['accept'].toLowerCase() == "application/json") {
-			  res.writeHead(200, {'Content-Type': 'application/json'});
-			  res.end(JSON.stringify({'ip': addr}, null, 4) + "\n");			
-			  return ;
-		}
-	}
-	
-	var pathname = url.parse(req.url).pathname
-	if(pathname == "/game") {
-	    fs.readFile('./ejsa/index.html', 'utf-8',function (err, data) {//read cotent
-                    if (err) throw err;
-                    res.writeHead(200, {
-                        "Content-Type": "text/html"
-                    });
-                    res.write(data);
-                    res.end();
-                });
-	} else {
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.write("Welcome to Node.js on OpenShift!\n\n");
-        res.end("Your IP address seems to be " + addr + "\n");
-	}
-}).listen(port, ipaddr);
+////app.configure(function(){
+////  app.set('views', __dirname + '/views');
+////  app.set('view engine', 'jade');
+////  app.use(express.bodyParser());
+////  app.use(express.methodOverride());
+////  app.use(app.router);
+////  app.use(express.static(__dirname + '/public'));
+////});
+////
+////app.configure('development', function(){
+////  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+////});
+////
+////app.configure('production', function(){
+////  app.use(express.errorHandler());
+////});
 
-console.log("Server running at http://" + ipaddr + ":" + port + "/");
+app.use(express.logger());
+
+// Routes
+
+//app.get('/', routes.index);
+app.get('/', function(req, res){
+    res.send('Hello World');
+});
+
+
+app.listen(port);
+//console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+console.log('Express server started on port %s', process.env.PORT);
