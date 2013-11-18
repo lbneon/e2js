@@ -6,7 +6,8 @@
 var express = require('express')
   , routes = require('./routes');
 
-var app = express();
+//var app = express();
+var app = express.createServer();
 
 var port    = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080;
 
