@@ -21,21 +21,25 @@ var App = function(){
    
 
   // Web app logic
-  self.routes = {};
-  self.routes['health'] = function(req, res){ res.send('1'); };
-
-  self.routes['root'] = function(req, res){
-    self.db.collection('names').find().toArray(function(err, names) {
-        res.header("Content-Type:","text/json");
-        res.end(JSON.stringify(names));
-    });
-  };
+  ////self.routes = {};
+  ////self.routes['health'] = function(req, res){ res.send('1'); };
+////
+  ////self.routes['root'] = function(req, res){
+  ////  self.db.collection('names').find().toArray(function(err, names) {
+  ////      res.header("Content-Type:","text/json");
+  ////      res.end(JSON.stringify(names));
+  ////  });
+  ////};
 
     // Webapp urls
   
   self.app  = express.createServer();
-  self.app.get('/health', self.routes['health']);
-  self.app.get('/', self.routes['root']);
+  //self.app.get('/health', self.routes['health']);
+  //self.app.get('/', self.routes['root']);
+  self.app.get('/', function(req, res){
+    res.send(req.online.length + ' users online');
+  });
+
   
   //starting the nodejs server with express
 
