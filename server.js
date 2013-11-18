@@ -14,4 +14,4 @@ app.get('/', function(req, res){
 });
 
 app.listen(port);
-console.log('Express server started on port %s', app.address().port);
+//console.log('Express server started on port %s', app.address().port);
